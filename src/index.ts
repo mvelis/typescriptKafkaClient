@@ -3,7 +3,6 @@ import { loadModules } from './app/modules'
 import { instanceKafkaClient } from './utils/queue/kafkaClient'
 //const KafkaClient = require('./utils/queue/KafkaClient')
 
-
 const app = makeApp(loadModules)
 app.boot()
 app.on(
@@ -11,41 +10,60 @@ app.on(
   (): void => {
     app.start(
       (): void => {
-
-        
         const kafkaConsumerClient = instanceKafkaClient('consumer')
         kafkaConsumerClient.init()
-        kafkaConsumerClient.on(`consumer-queue:connected`, (data: any) => {
-            console.log(`consumer-queue:connected`)
-        })
-        .on(`consumer-queue:new-message`, (data: any) => {
-          console.log('AJA MI DATA! ', data)
-          kafkaConsumerClient.acknowledgeMsg(data);
-        })
-
+        kafkaConsumerClient
+          .on(
+            `consumer-queue:connected`,
+            (data: any): void => {
+              console.log(`consumer-queue:connected`)
+            },
+          )
+          .on(
+            `consumer-queue:new-message`,
+            (data: any): void => {
+              console.log('AJA MI DATA! ', data)
+              kafkaConsumerClient.acknowledgeMsg(data)
+            },
+          )
 
         const kafkaProducerClient = instanceKafkaClient('producer')
         kafkaProducerClient.init()
-        kafkaProducerClient.on(`producer-queue:connected`, (data: any) => {
-            console.log(`producer-queue:connected`)
-        })
-        .on(`producer-queue:connected`, () => {
-            console.log('aqui evento connected')
-              for(let i = 0; i < 3; i++){
-                kafkaProducerClient.publish('aja', `${i} aqui mi mensajito`)
-                .then()
-                .catch( (err: any) => {
-                  console.log('aqui mi error ', err)
-                });
+        kafkaProducerClient
+          .on(
+            `producer-queue:connected`,
+            (data: any): void => {
+              console.log(`producer-queue:connected`)
+            },
+          )
+          .on(
+            `producer-queue:connected`,
+            (): void => {
+              console.log('aqui evento connected')
+              for (let i = 0; i < 3; i++) {
+                kafkaProducerClient
+                  .publish('aja', `${i} aqui mi mensajito`)
+                  .then()
+                  .catch(
+                    (err: any): void => {
+                      console.log('aqui mi error ', err)
+                    },
+                  )
               }
-        })
-        .on('producer-queue:error', () => {
-          console.log('producer aqui evento error')
-        })
-        .on('producer-queue:disconnected', () => {
-          console.log('producer aqui evento disconnected')
-        })
-
+            },
+          )
+          .on(
+            'producer-queue:error',
+            (): void => {
+              console.log('producer aqui evento error')
+            },
+          )
+          .on(
+            'producer-queue:disconnected',
+            (): void => {
+              console.log('producer aqui evento disconnected')
+            },
+          )
 
         // const kafkaClientType: string = 'consumer'
         // const kafkaClient = new KafkaClientClass(kafkaClientType)
