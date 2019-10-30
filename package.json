@@ -19,9 +19,15 @@
   "author": "Ernesto Fuentes Gómez",
   "license": "ISC",
   "dependencies": {
+    "@types/mongodb": "^3.3.7",
+    "@types/sinon": "^7.5.0",
+    "cuid": "^2.1.6",
     "dotenv": "^6.2.0",
+    "koa": "^2.11.0",
+    "mongodb": "^3.3.3",
     "node-emoji": "^1.10.0",
     "node-rdkafka": "^2.7.1-2",
+    "sinon": "^7.5.0",
     "winston": "^3.2.1"
   },
   "devDependencies": {
@@ -37,7 +43,7 @@
     "jest": "^24.5.0",
     "module-alias": "^2.2.0",
     "nodemon": "^1.18.10",
-    "prettier": "^1.16.4",
+    "prettier": "^1.18.2",
     "ts-jest": "^24.0.0",
     "ts-node": "^8.0.3",
     "typescript": "^3.3.3333"
