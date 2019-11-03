@@ -20,11 +20,13 @@
   "license": "ISC",
   "dependencies": {
     "@types/mongodb": "^3.3.7",
+    "@types/mongoose": "^5.5.28",
     "@types/sinon": "^7.5.0",
     "cuid": "^2.1.6",
     "dotenv": "^6.2.0",
     "koa": "^2.11.0",
     "mongodb": "^3.3.3",
+    "mongoose": "^5.7.7",
     "node-emoji": "^1.10.0",
     "node-rdkafka": "^2.7.1-2",
     "sinon": "^7.5.0",

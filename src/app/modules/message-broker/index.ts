@@ -1,7 +1,7 @@
 import logger from '../../../utils/logger'
-import { ModuleBooter, Module } from '../index'
+import { ModuleBooter, Module, AModule } from '../index'
 
-export const boot: ModuleBooter = (): Module => {
+export const boot: ModuleBooter = (): Module<AModule> => {
   const name = 'message-broker'
 
   return {

@@ -1,10 +1,10 @@
 import emoji from 'node-emoji'
 import logger from '../utils/logger'
 import { EventEmitter } from 'events'
-import { Module, ModulesLoader } from './modules'
+import { Module, ModulesLoader, AModule } from './modules'
 
 interface AppContext {
-  [key: string]: Module
+  [key: string]: Module<AModule>
 }
 
 export interface Application extends EventEmitter {
@@ -51,11 +51,9 @@ export function makeApp(loadModules: ModulesLoader): Application {
 
   app.close = (): void => {
     logger.setPrefix('shutdown')
-    Object.keys(app.context).forEach(
-      (moduleName): void => {
-        app.context[moduleName].close()
-      },
-    )
+    Object.keys(app.context).forEach((moduleName): void => {
+      app.context[moduleName].close()
+    })
     logger.info(`Application closed ${emoji.get('sleeping')}`)
   }
 

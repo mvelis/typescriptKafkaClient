@@ -1,5 +1,10 @@
-import buildMakeRefunderEvent from './refunder-event'
+import { buildRefundMessage } from './refund-message'
+import { buildRefund } from './refund'
 
-const makeRefunderEvent = buildMakeRefunderEvent({})
-
-export default makeRefunderEvent
+const makeRefundMessage = buildRefundMessage({
+  /** here my dependencies  */
+})
+const makeRefund = buildRefund({
+  /** here my dependencies  */
+})
+export { makeRefundMessage, makeRefund }

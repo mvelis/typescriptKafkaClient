@@ -1,19 +1,22 @@
 import path from 'path'
 import fs, { Dirent } from 'fs'
 import logger from '../../utils/logger'
+import { MongoClientDb } from '../database/mongodb/client/mongo-client'
+
+export type AModule = MongoClientDb | object
 
 type DirTuple = [string, string]
 
-export type ModuleBooter = () => Module | Promise<Module>
-export interface Module {
+export type ModuleBooter = () => Module<AModule> | Promise<Module<AModule>>
+export interface Module<T> {
   name: string
   close: () => Promise<void>
-  context: object
+  context: T
 }
 
-export type ModulesLoader = () => Promise<Module[]>
-export const loadModules: ModulesLoader = async (): Promise<Module[]> => {
-  const modules: Module[] = []
+export type ModulesLoader = () => Promise<Module<AModule>[]>
+export const loadModules: ModulesLoader = async (): Promise<Module<AModule>[]> => {
+  const modules: Module<AModule>[] = []
 
   const modulePaths = fs
     .readdirSync(__dirname, { withFileTypes: true })

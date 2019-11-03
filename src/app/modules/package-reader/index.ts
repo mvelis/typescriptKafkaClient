@@ -1,5 +1,5 @@
 import fs from 'fs'
-import { ModuleBooter, Module } from '../index'
+import { ModuleBooter, Module, AModule } from '../index'
 import logger from '../../../utils/logger'
 
 interface ProjectSettings {
@@ -9,7 +9,7 @@ interface ProjectSettings {
   version: string
 }
 
-export const boot: ModuleBooter = (): Module => {
+export const boot: ModuleBooter = (): Module<AModule> => {
   try {
     const name = 'package-reader'
     const projectProperties = JSON.parse(fs.readFileSync(`${process.cwd()}/package.json`).toString())

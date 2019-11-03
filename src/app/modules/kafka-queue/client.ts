@@ -1,62 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { EventEmitter } from 'events'
 import Kafka, { HighLevelProducer, KafkaConsumer } from 'node-rdkafka'
-
-export interface KafkaCommitMessage {
-  topic: string
-  offset: string
-  partition: string
-}
-
-export interface KafkaMessage {
-  value: string
-  size: number
-  key: string
-  timestamp: number
-  topic: string
-  offset: number
-  partition: number
-}
-
-export interface KafkaClientInterface extends EventEmitter {
-  getState: () => string
-  acknowledgeMsg: (message: KafkaMessage) => void
-  subscribe: () => void
-  publish: (topicName: string, message: string) => Promise<number>
-  disconnet: () => void
-  connect: () => void
-  isProducerConnected: () => boolean
-  isConsumerConnected: () => boolean
-}
-
-export interface KafkaConfig {
-  consumerTopicName: string
-  producerTopicName: string
-  brokers: string
-  groupid: string
-}
+import { KafkaConfig, KafkaCommitMessage, KafkaMessage, KafkaClientInterface } from './interfaces'
+import { STATES_ENUM, EVENT_ENUM } from './enums'
 
 export function instanceKafkaClient(config: KafkaConfig): KafkaClientInterface {
   const clientInstance = new EventEmitter() as KafkaClientInterface
-  const STATES_ENUM = {
-    INITIALIZING: 'initializing',
-    DISCONNECTED: 'disconnected',
-    CONNECTED: 'connected',
-  }
-  const EVENT_ENUM = {
-    CONNECTED: 'queue:connected',
-    DISCONNECTED: 'queue:disconnected',
-    ERROR: 'queue:error',
-    NEW_MESSAGE: 'queue:new_message',
-  }
-  let currentState: string
-  currentState = STATES_ENUM.INITIALIZING
-  let producerClient: HighLevelProducer
-  let consumerClient: KafkaConsumer
+  let currentState = STATES_ENUM.INITIALIZING
   let producerConnected = false
   let consumerConnected = false
 
-  producerClient = new Kafka.HighLevelProducer({
+  let producerClient: HighLevelProducer = new Kafka.HighLevelProducer({
     'metadata.broker.list': config.brokers,
   })
   producerClient.connect()
@@ -77,7 +30,7 @@ export function instanceKafkaClient(config: KafkaConfig): KafkaClientInterface {
       /** emit masked disconnected event when whenever consumer or producer emit an disconnected event */
       clientInstance.emit(`${EVENT_ENUM.DISCONNECTED}`, arg)
     })
-  consumerClient = new Kafka.KafkaConsumer(
+  let consumerClient: KafkaConsumer = new Kafka.KafkaConsumer(
     {
       'metadata.broker.list': config.brokers,
       'group.id': config.groupid,
@@ -138,8 +91,8 @@ export function instanceKafkaClient(config: KafkaConfig): KafkaClientInterface {
   }
 
   clientInstance.acknowledgeMsg = (message: KafkaMessage): void => {
-    console.log('acknowlegeando mi data ', message)
-    const { topic, offset, partition }: KafkaMessage = message
+    console.log('\t\t\tacknowlegeando mi data ', message)
+    const { topic, offset, partition }: KafkaCommitMessage = message
     try {
       consumerClient.commitMessage({ topic, offset, partition })
     } catch (err) {
