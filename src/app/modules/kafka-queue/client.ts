@@ -11,6 +11,14 @@ export function instanceKafkaClient(config: KafkaConfig): KafkaClientInterface {
 
   let producerClient: HighLevelProducer = new Kafka.HighLevelProducer({
     'metadata.broker.list': config.brokers,
+    'client.id': config.producerClientId,
+    'compression.codec': 'gzip',
+    'retry.backoff.ms': 200,
+    'message.send.max.retries': 10,
+    'socket.keepalive.enable': true,
+    'queue.buffering.max.messages': 100000,
+    'queue.buffering.max.ms': 1000,
+    'batch.num.messages': 1000000,
   })
   producerClient.connect()
   producerClient
@@ -38,29 +46,29 @@ export function instanceKafkaClient(config: KafkaConfig): KafkaClientInterface {
     },
     {},
   )
-  consumerClient.connect()
-  consumerClient
-    .on('ready', (): void => {
-      consumerConnected = true
-      currentState = STATES_ENUM.CONNECTED
-      /** automatically consumer subscribe when emit event ready */
-      clientInstance.subscribe()
-      /** just emit masked connected event when producer is ready to publish */
-    })
-    .on('data', (data: KafkaMessage | any): void => {
-      /** emit masked new message event when consumer emit data event */
-      clientInstance.emit(`${EVENT_ENUM.NEW_MESSAGE}`, data)
-    })
-    .on('event.error', (err: Error): void => {
-      /** emit masked error event when whenever consumer or producer emit an error event */
-      clientInstance.emit(`${EVENT_ENUM.ERROR}`, err)
-    })
-    .on('disconnected', (arg: Error): void => {
-      consumerConnected = false
-      currentState = STATES_ENUM.DISCONNECTED
-      /** emit masked disconnected event when whenever consumer or producer emit an disconnected event */
-      clientInstance.emit(`${EVENT_ENUM.DISCONNECTED}`, arg)
-    })
+  // consumerClient.connect()
+  // consumerClient
+  //   .on('ready', (): void => {
+  //     consumerConnected = true
+  //     currentState = STATES_ENUM.CONNECTED
+  //     /** automatically consumer subscribe when emit event ready */
+  //     clientInstance.subscribe()
+  //     /** just emit masked connected event when producer is ready to publish */
+  //   })
+  //   .on('data', (data: KafkaMessage | any): void => {
+  //     /** emit masked new message event when consumer emit data event */
+  //     clientInstance.emit(`${EVENT_ENUM.NEW_MESSAGE}`, data)
+  //   })
+  //   .on('event.error', (err: Error): void => {
+  //     /** emit masked error event when whenever consumer or producer emit an error event */
+  //     clientInstance.emit(`${EVENT_ENUM.ERROR}`, err)
+  //   })
+  //   .on('disconnected', (arg: Error): void => {
+  //     consumerConnected = false
+  //     currentState = STATES_ENUM.DISCONNECTED
+  //     /** emit masked disconnected event when whenever consumer or producer emit an disconnected event */
+  //     clientInstance.emit(`${EVENT_ENUM.DISCONNECTED}`, arg)
+  //   })
 
   clientInstance.getState = (): string => currentState
   clientInstance.isProducerConnected = (): boolean => producerConnected

@@ -1,40 +1,50 @@
-import { KafkaClientInterface, KafkaMessage } from '../modules/kafka-queue/interfaces'
-import { saveRefund } from '../use-cases'
-import { makeRefundMongoRepository } from '../database/mongodb'
+import { KafkaClientInterface } from '../modules/kafka-queue/interfaces'
 import logger from '../../utils/logger'
+import cuid from 'cuid'
+import readline from 'readline'
+
+function askQuestion(query: any): Promise<any> {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  })
+
+  return new Promise(resolve =>
+    rl.question(query, ans => {
+      rl.close()
+      resolve(ans)
+    }),
+  )
+}
 
 export default function serverStarter(queue: KafkaClientInterface): void {
-  queue
-    .on(
-      `queue:new_message`,
-      async (data: KafkaMessage): Promise<void> => {
-        console.log('*************************************************************')
-        const incomingMessage = data
-        const messageToConsume = data.value.toString().replace(/[^\x20-\x7E]/g, '')
-        console.log('queue:new_message', messageToConsume)
-        const refundObject = {
-          orderId: 'xxxx',
-          amount: 100,
-          state: 'received',
-          createdAt: new Date(),
-          metadata: messageToConsume,
+  queue.on(
+    'queue:connected',
+    async (): Promise<void> => {
+      console.log('queue:connected')
+      while (true) {
+        await askQuestion('\npress ENTER to publish a message')
+        const message: any = {
+          requestid: `requestid-${cuid()}`,
+          orderid: `orderid-${cuid()}`,
+          amount: Math.floor(Math.random() * 1000) + 1,
+          metadata: {},
         }
-        await saveRefund(makeRefundMongoRepository(), refundObject)
-        const messageToPublish = `answer for msge ${messageToConsume}`
-        queue
-          .publish(process.env.KAFKA_PRODUCER_TOPIC_NAME || '', messageToPublish)
+        await queue
+          .publish(process.env.KAFKA_PRODUCER_TOPIC_NAME || '', JSON.stringify(message))
           .then((data: number): void => {
-            console.log('\t\t\there my published message', data)
-            queue.acknowledgeMsg(incomingMessage)
+            console.log('\r\t\there my published message', data, message)
           })
           .catch((err: Error): void => {
             console.log('\t\t\tAn error has ocurred trying to publish message to queue', err)
           })
-      },
-    )
+      }
+    },
+  )
 
-    .on(`queue:error`, (err: Error): void => {
-      logger.error(['error at kafka queue', err.toString()])
-      process.exit(1)
-    })
+  queue.on(`queue:error`, (err: Error): void => {
+    queue.disconnet()
+    logger.error(['error at kafka queue', err.toString()])
+    process.exit(1)
+  })
 }

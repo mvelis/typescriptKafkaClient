@@ -2,8 +2,9 @@ import path from 'path'
 import fs, { Dirent } from 'fs'
 import logger from '../../utils/logger'
 import { MongoClientDb } from '../database/mongodb/client/mongo-client'
+import { KafkaClientInterface } from '../modules/kafka-queue/interfaces'
 
-export type AModule = MongoClientDb | object
+export type AModule = MongoClientDb | KafkaClientInterface | object
 
 type DirTuple = [string, string]
 

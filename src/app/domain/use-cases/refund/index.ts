@@ -1,4 +1,4 @@
-import { RefundRepository } from '../../repositories/refund'
+import { RefundRepository } from '../../../repositories/refund'
 import { Refund } from '../../entities/refund'
 import { makeRefund } from '../../entities'
 
@@ -15,7 +15,7 @@ const saveRefund = async function(repository: RefundRepository, message: Refund)
 const updateRefund = async function(repository: RefundRepository, message: Refund): Promise<string> {
   const refundMsg = makeRefund(message)
   try {
-    return await repository.save(refundMsg)
+    return await repository.update(refundMsg)
   } catch (ex) {
     return ex
   }

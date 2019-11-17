@@ -32,4 +32,5 @@ export interface KafkaConfig {
   producerTopicName: string
   brokers: string
   groupid: string
+  producerClientId: string
 }

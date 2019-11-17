@@ -1,4 +1,4 @@
-import { RefundMessage } from '../entities/refund-message'
+import { RefundMessage } from '../domain/entities/refund-message'
 
 export interface RefundMessageRepository {
   save: (msg: RefundMessage) => Promise<RefundMessage>

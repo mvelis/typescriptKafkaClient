@@ -1,4 +1,4 @@
-import { RefundMessageRepository } from '../../repositories/refund-message'
+import { RefundMessageRepository } from '../../../repositories/refund-message'
 import { RefundMessage } from '../../entities/refund-message'
 import { makeRefundMessage } from '../../entities'
 
